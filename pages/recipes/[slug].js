@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import {
-  sanityClient,
-  urlFor,
-  usePreviewSubscription,
-  PortableText,
-} from "../../lib/sanity";
+import Image from "next/image";
+import { sanityClient, urlFor, PortableText } from "../../lib/sanity";
 
 const recipeQuery = `*[_type=="recipe" && slug.current == $slug][0]{
     _id, name, slug,
@@ -19,9 +15,12 @@ const recipeQuery = `*[_type=="recipe" && slug.current == $slug][0]{
 
 export default function OneRecipe({ data }) {
   const router = useRouter();
+  const [likes, setLikes] = useState(data?.recipe?.likes);
+
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
+
   const { recipe } = data;
   //   if (!data) return <div>Loading...</div>;
   //   const { data: recipe } = usePreviewSubscription(recipeQuery, {
@@ -31,7 +30,6 @@ export default function OneRecipe({ data }) {
   //   });
 
   //   const { recipe } = data;
-  const [likes, setLikes] = useState(data?.recipe?.likes);
 
   const addLike = async () => {
     const res = await fetch("/api/handle-like", {
@@ -50,7 +48,7 @@ export default function OneRecipe({ data }) {
         {likes} ❤️
       </button>
       <main className="content">
-        <img src={urlFor(recipe?.mainImage)} alt={recipe.name} />
+        <Image src={urlFor(recipe?.mainImage)} alt={recipe.name} />
         <div className="breakdown">
           <ul className="ingredients">
             {recipe.ingredient?.map((ingredient) => (
